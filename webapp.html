@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <a href="index.html">Home Page</a>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #acb6e5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: white;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    }
+
+    #game {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+      transition: opacity 0.5s;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s, background-color 0.3s;
+    }
+
+    .cell:hover:not(.taken):not(.dimmed) {
+      background-color: #e0f7fa;
+      transform: scale(1.05);
+    }
+
+    .cell.taken {
+      cursor: default;
+      color: #555;
+    }
+
+    #status {
+      margin-top: 30px;
+      font-size: 1.6em;
+      min-height: 2em;
+      color: white;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    }
+
+    #status.win {
+      color: #ffeb3b;
+      text-shadow: 0 0 12px #fff176;
+      animation: pop 0.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes pop {
+      from { transform: scale(1); }
+      to { transform: scale(1.1); }
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px 25px;
+      font-size: 1em;
+      background-color: #4fc3f7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #29b6f6;
+    }
+
+    .confetti {
+      font-size: 2em;
+      position: absolute;
+      animation: floatUp 1s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-100px); }
+    }
+
+    .dimmed {
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Tic Tac Toe</h1>
+  <div id="game"></div>
+  <div id="status">Your turn!</div>
+  <button onclick="resetGame()">Play Again</button>
+
+  <script>
+    const gameEl = document.getElementById('game');
+    const statusEl = document.getElementById('status');
+
+    let board = Array(9).fill(null);
+    let isGameOver = false;
+
+    const winningCombos = [
+      [0,1,2], [3,4,5], [6,7,8],
+      [0,3,6], [1,4,7], [2,5,8],
+      [0,4,8], [2,4,6]
+    ];
+
+    function renderBoard() {
+      gameEl.innerHTML = '';
+      board.forEach((cell, idx) => {
+        const cellEl = document.createElement('div');
+        cellEl.className = 'cell';
+        if (cell) {
+          cellEl.textContent = cell;
+          cellEl.classList.add('taken');
+        }
+        cellEl.addEventListener('click', () => playerMove(idx));
+        gameEl.appendChild(cellEl);
+      });
+    }
+
+    function playerMove(index) {
+      if (isGameOver || board[index]) return;
+      board[index] = 'X';
+      renderBoard();
+      if (checkWin('X')) {
+        endGame('You win! 🎉', true);
+        return;
+      }
+      if (board.every(cell => cell)) {
+        endGame("It's a draw!", false);
+        return;
+      }
+      statusEl.textContent = "Computer's turn...";
+      setTimeout(computerMove, 500);
+    }
+
+    function computerMove() {
+      let emptyIndexes = board.map((val, i) => val === null ? i : null).filter(i => i !== null);
+      if (emptyIndexes.length === 0) return;
+      let choice = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)];
+      board[choice] = 'O';
+      renderBoard();
+      if (checkWin('O')) {
+        endGame('Computer wins! 💻', true);
+      } else if (board.every(cell => cell)) {
+        endGame("It's a draw!", false);
+      } else {
+        statusEl.textContent = 'Your turn!';
+      }
+    }
+
+    function checkWin(player) {
+      return winningCombos.some(combo =>
+        combo.every(i => board[i] === player)
+      );
+    }
+
+    function endGame(message, isWin) {
+      isGameOver = true;
+      statusEl.textContent = message;
+      if (isWin) {
+        statusEl.classList.add('win');
+        gameEl.classList.add('dimmed');
+        launchConfetti();
+      }
+    }
+
+    function resetGame() {
+      board = Array(9).fill(null);
+      isGameOver = false;
+      statusEl.textContent = 'Your turn!';
+      statusEl.classList.remove('win');
+      gameEl.classList.remove('dimmed');
+      renderBoard();
+    }
+
+    function launchConfetti() {
+      const emojis = ['🎉', '✨', '🎊', '💥', '🥳'];
+      for (let i = 0; i < 10; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        confetti.style.left = Math.random() * window.innerWidth + 'px';
+        confetti.style.top = Math.random() * window.innerHeight / 2 + 'px';
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 1000);
+      }
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
