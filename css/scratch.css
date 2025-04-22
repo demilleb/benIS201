@@ -1,27 +1,29 @@
-    body {
+body {
       font-family: 'Georgia', serif;
       background-color: #f5f5dc;
-      color: #2e2e2e;
+      color:Black;
       margin: 0;
     }
-
-    h1 {
+h1 {
       background-color: #0b6623;
       color: white;
       text-align: center;
-      padding: 40px 20px;
+      padding: 40px 20px; 
     }
-.container-list{
-  text-align: center;
+
+.list-center{
+  display: flex;
+  justify-content: center;
+  text-align: left;
 }
+
 .container-list ol,
 .container-list ul{
   text-align: center;
   list-style-position: outside;
 padding-left: 20px;
 }
-
-    winners {
+winners {
       background-color: #ffffff;
       padding: 20px;
       margin: 20px;
@@ -29,7 +31,7 @@ padding-left: 20px;
     
     }
 
-    .picture-block{
+.picture-block{
       border: 1px solid green;
       padding: 20 px;
       margin: auto;
@@ -41,11 +43,11 @@ padding-left: 20px;
     h2{ text-align: center;
     }
 
-    .tableau-block{
+.tableau-block{
       border: 1px solid green;
       padding: 20 px;
       margin: auto;
-      width: 1000;
+      width: 100;
       max-width: 560px;
       background-color: green;
       border-radius: 8px;
